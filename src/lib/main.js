@@ -1,25 +1,47 @@
 var data = require("sdk/self").data;
 var tabs = require("sdk/tabs");
 var buttons = require('sdk/ui/button/action');
+var api = require('./cocktails.js')
+
+var panel = require("sdk/panel").Panel({
+  width: 300,
+  height: 300,
+  contentURL: data.url("panel/panel.html"),
+  contentScriptFile: data.url("panel/panel.js"),
+  contentScriptStyle: data.url("panel/panel.css")
+});
 
 var button = buttons.ActionButton({
-  id: "mozilla-link",
-  label: "Visit Mozilla",
+  id: "main-btn",
+  label: "Barman",
   icon: {
-    "16": "./icons/icon-16.png",
-    "32": "./icons/icon-32.png",
-    "64": "./icons/icon-64.png"
+    "16": "./icons/cocktail16.png",
+    "32": "./icons/cocktail32.png",
+    "64": "./icons/cocktail64.png"
   },
   onClick: startAnalysis
 });
+
+panel.on("hide", function() {
+	panel.port.emit("hide");
+})
+
+panel.port.on("hide-request", function() {
+	panel.hide();
+});
+
 
 function startAnalysis(state) {
   	var worker = tabs.activeTab.attach({
 		contentScriptWhen: "end",
 	  	contentScriptFile: [data.url("barman.js"), data.url("ext/html2canvas.js"), data.url("ext/color-thief.min.js")],
     });	
-	worker.port.emit("startAnalysis");
-	worker.port.on("analysisFinished", function(colorPalette) {
- 		console.log(JSON.parse(colorPalette))
+
+    worker.port.on("analysisFinished", function(colorPalette) {
+    	var chosenCocktail = api.getCocktailByPalette(JSON.parse(colorPalette));
+ 		panel.port.emit("analysisFinished", chosenCocktail)
  	});
+
+    panel.show();
+	worker.port.emit("startAnalysis");
 }
