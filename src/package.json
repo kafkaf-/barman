@@ -1,9 +1,9 @@
 {
   "name": "src",
-  "title": "src",
+  "title": "Barman",
   "id": "jid1-sfBXOoe6RuZAag",
-  "description": "a basic add-on",
-  "author": "",
+  "description": "An addon that suggets a drink, based on a website",
+  "author": "Moshe Magnes, Sharon Krendel",
   "license": "MPL 2.0",
   "version": "0.1"
 }
