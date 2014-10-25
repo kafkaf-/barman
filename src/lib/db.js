@@ -1,3 +1,3 @@
 exports.dbapi = {
-  this.cocktails = []
+  cocktails: []
 }

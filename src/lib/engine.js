@@ -1,10 +1,14 @@
-var dbapi = require('./db.js')
-var utils = require('./color.js')
+var dbapi = require('./db.js');
+var utils = require('./color.js');
 
-exports.getCocktailByPalette = function (palette) {
+var g = function (palette, cocktailCollection) {
+	if (!cocktailCollection) {
+		cocktailCollection = dbapi.cocktails;
+	}
+
 	var similarCocktail = null;
 	var highestRank = 0;
-	for (var cocktail in dbapi.cocktails) {
+	for (var cocktail in cocktailCollection) {
 		var p = new utils.Palette(cocktail.palette);
 		var currentRank = p.rankSimilarirty(palette);
 		if (currentRank > highestRank) {
@@ -18,3 +22,5 @@ exports.getCocktailByPalette = function (palette) {
 
 	return similarCocktail;
 };
+
+exports.getCocktailByPalette = g;
