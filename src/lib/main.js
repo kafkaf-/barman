@@ -2,7 +2,7 @@ var data = require("sdk/self").data;
 var tabs = require("sdk/tabs");
 var buttons = require('sdk/ui/button/action');
 var engine = require('./engine.js')
-var colors = require('./colors.js')
+var utils = require('./color.js')
 
 var panel = require("sdk/panel").Panel({
   width: 300,
@@ -42,8 +42,8 @@ function startAnalysis(state) {
 	  	contentScriptFile: [data.url("barman.js"), data.url("ext/html2canvas.js"), data.url("ext/color-thief.min.js")],
     });
 
-    worker.port.on(doneSignal, function(colorPalette) {
-      var p = new colors.Palette(colorPalette.slice(1))
+    worker.port.on(doneSignal, function(palette) {
+      var p = new utils.Palette(palette.slice(1))
       var chosenCocktail = engine.getCocktailByPalette(p);
    		panel.port.emit(doneSignal, chosenCocktail)
  	});
