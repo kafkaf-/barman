@@ -32,3 +32,12 @@ exports.multipleRegression = function(dx, dy, dz) {
   };
   return regression;
 }
+
+exports.euclideanDistance = function(vector1, vector2) {
+    var distance = 0;
+    for (i = 0; i < 3; i++) {
+      distance += Math.pow((vector1[i] - vector2[i]), 2);
+    };
+
+    return Math.sqrt(distance);
+}

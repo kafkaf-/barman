@@ -1,15 +1,5 @@
 var emath = require("./math.js");
 
-function euclideanDistance(vector1, vector2) {
-    var distance = 0;
-    for (i = 0; i < 3; i++) {
-      distance += Math.pow((vector1[i] - vector2[i]), 2);
-    };
-
-    return Math.sqrt(distance);
-}
-
-
 function Color(rgb) {
   this.rgb = rgb;
   this.r = rgb[0];
@@ -17,7 +7,7 @@ function Color(rgb) {
   this.b = rgb[2];
   this.distanceFrom = function(color) {
     // Returns an euclidean distance from another color
-    return euclideanDistance(this.rgb, color.rgb);
+    return emath.euclideanDistance(this.rgb, color.rgb);
   }
 }
 
@@ -47,8 +37,8 @@ function Palette(colors) {
     }
 
     var dMax = Math.sqrt(3 * Math.pow(65025, 2))
-    var d1 = euclideanDistance([a[0].x, a[0].y, a[0].z], [a[1].x, a[1].y, a[1].z]) / dMax;
-    var d2 = euclideanDistance([b[0].x, b[0].y, b[0].z], [b[1].x, b[1].y, b[1].z]) / dMax;
+    var d1 = emath.euclideanDistance([a[0].x, a[0].y, a[0].z], [a[1].x, a[1].y, a[1].z]) / dMax;
+    var d2 = emath.euclideanDistance([b[0].x, b[0].y, b[0].z], [b[1].x, b[1].y, b[1].z]) / dMax;
 
     return d1 + d2;
   }
@@ -63,7 +53,7 @@ function Palette(colors) {
         greens.push(this.colors[i].g)
         blues.push(this.colors[i].b)
     }
-    
+
     return emath.multipleRegression(reds, greens, blues);
   }
 }
