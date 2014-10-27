@@ -7,14 +7,16 @@ var g = function (palette, cocktailCollection) {
 	}
 
 	var similarCocktail = null;
-	var highestRank = 0;
+	var highestRank = 1;
+
 	for (var cocktail in cocktailCollection) {
-		var p = new utils.Palette(cocktail.palette);
-		var currentRank = p.rankSimilarirty(palette);
-		if (currentRank > highestRank) {
-			similarCocktail = cocktail;
+		var currentCocktail = cocktailCollection[cocktail];
+		var currentRank = currentCocktail.palette.rankSimilarity(palette);
+
+		if (currentRank < highestRank) {
+			similarCocktail = currentCocktail;
 			highestRank = currentRank;
-			if (currentRank >= 0.9) {
+			if (currentRank == 0) {
 				break;
 			}
 		}

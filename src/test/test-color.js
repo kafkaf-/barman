@@ -32,7 +32,7 @@ exports["test similarity ranking, same palettes"] = function(assert) {
   }
 }
 
-exports["test similarity ranking, totally different palettes"] = function(assert) {
+exports["test similarity ranking, black and white"] = function(assert) {
   var palettes =[
     [
       [[0,0,0]], [[255,255,255]]
@@ -43,7 +43,7 @@ exports["test similarity ranking, totally different palettes"] = function(assert
     var palette1 = new color.Palette(palettes[index][0]);
     var palette2 = new color.Palette(palettes[index][1]);
     assert.ok(palette1.rankSimilarity(palette2) == 1,
-    "Similarity ranking of totally different palettes is 1")
+    "Similarity ranking of black and white is 1")
   }
 }
 

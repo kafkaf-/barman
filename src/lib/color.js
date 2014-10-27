@@ -1,5 +1,13 @@
 var emath = require("./math.js");
 
+var values = function(arr) {
+  var vals = [];
+  for (var index in arr) {
+    vals.push(arr[index]);
+  }
+  return vals;
+}
+
 function Color(rgb) {
   this.rgb = rgb;
   this.r = rgb[0];
@@ -11,34 +19,39 @@ function Color(rgb) {
   }
 }
 
-function Palette(colors) {
+function Palette(colors, iVector) {
   this.colors = [];
+  this.iVector = iVector;
+
   for (var index in colors) {
     this.colors.push(new Color(colors[index]))
   };
 
-  this.rankSimilarity = function(palette) {
-    // A rank to messaure similarity between palettes(0-1)
-    // Assumes all palettes are of the same length
+  this.calcIVector = function() {
     var cords = ["x", "y", "z"];
-    var r = [];
-    var a = [{}, {}];
-    var b = [{}, {}];
+    var max = {};
+    var min = {};
 
     // r[i] is a hash of the multiple regression of the Palette in RGB space
-    r[0] = this.fit()
-    r[1] = palette.fit();
-    for (i = 0; i < 2; i++) {
-      for (var index in cords) {
-        var currentCord = cords[index];
-        a[i][currentCord] = 0 * r[i].slope[currentCord] + r[i].offset[currentCord];
-        b[i][currentCord] = 255 * r[i].slope[currentCord] + r[i].offset[currentCord];
-      }
+    var r = this.fit()
+    for (var index in cords) {
+      var currentCord = cords[index];
+      min[currentCord] = 0 * r.slope[currentCord] + r.offset[currentCord];
+      max[currentCord] = 255 * r.slope[currentCord] + r.offset[currentCord];
     }
 
-    var dMax = Math.sqrt(3 * Math.pow(65025, 2))
-    var d1 = emath.euclideanDistance([a[0].x, a[0].y, a[0].z], [a[1].x, a[1].y, a[1].z]) / dMax;
-    var d2 = emath.euclideanDistance([b[0].x, b[0].y, b[0].z], [b[1].x, b[1].y, b[1].z]) / dMax;
+    this.iVector = {"min": min, "max": max}
+    return this.iVector;
+  }
+
+  this.rankSimilarity = function(palette) {
+    var dMax = Math.sqrt(3 * Math.pow(65025, 2));
+    
+    var myVector = this.iVector || this.calcIVector();
+    var otherVector = palette.iVector || palette.calcIVector();
+
+    var d1 = emath.euclideanDistance(values(myVector.min), values(otherVector.min)) / dMax;
+    var d2 = emath.euclideanDistance(values(myVector.max), values(otherVector.max)) / dMax;
 
     return d1 + d2;
   }
