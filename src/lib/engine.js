@@ -1,11 +1,6 @@
-var dbapi = require('./db.js');
 var utils = require('./color.js');
 
 var g = function (palette, cocktailCollection) {
-	if (!cocktailCollection) {
-		cocktailCollection = dbapi.cocktails;
-	}
-
 	var similarCocktail = null;
 	var highestRank = 1;
 
