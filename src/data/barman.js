@@ -24,13 +24,14 @@ function analyze() {
 }
 
 self.port.on("startAnalysis", function() {
-    var cachedPalette = getCachedPalette();
-    if (cachedPalette)
-    {
-        self.port.emit("analysisFinished", cachedPalette);
-    }
-    else
-    {
-        analyze();
-    }
+  try {
+      var cachedPalette = getCachedPalette();
+      if (cachedPalette) {
+          self.port.emit("analysisFinished", cachedPalette);
+      } else {
+          analyze();
+      }
+  } catch(err) {
+      self.port.emit("error", err.message);
+  }
 });

@@ -25,14 +25,16 @@ panel.port.on("hide-request", function() {
   panel.hide();
 });
 
+var iconsDefault = {
+  "16": "./icons/cocktail16.png",
+  "32": "./icons/cocktail32.png",
+  "64": "./icons/cocktail64.png"
+};
+
 var button = buttons.ActionButton({
   id: "main-btn",
   label: "Barman",
-  icon: {
-    "16": "./icons/cocktail16.png",
-    "32": "./icons/cocktail32.png",
-    "64": "./icons/cocktail64.png"
-  },
+  icon: iconsDefault,
   onClick: startAnalysis
 });
 
@@ -55,9 +57,9 @@ function startAnalysis(state) {
     var startSignal = "startAnalysis";
     var doneSignal = "analysisFinished";
     var errorSignal = "error";
-    
+
     var worker = tabs.activeTab.attach({
-    contentScriptWhen: "end",
+      contentScriptWhen: "end",
     	contentScriptFile: [data.url("barman.js"), data.url("ext/html2canvas.js"), data.url("ext/color-thief.min.js")],
     });
 
@@ -69,5 +71,10 @@ function startAnalysis(state) {
          position: button
        });
     });
+
+    worker.port.on(errorSignal, function(message) {
+      console.log(message);
+    });
+
     worker.port.emit(startSignal);
 }

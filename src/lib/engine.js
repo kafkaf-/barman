@@ -1,7 +1,6 @@
 var utils = require('./color.js');
 
 var g = function (palette, cocktailCollection) {
-	console.log(palette)
 	var similarCocktail = null;
 	var highestRank = 1;
 	for (var cocktail in cocktailCollection) {
