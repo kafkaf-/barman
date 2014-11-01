@@ -15,10 +15,14 @@ function analyze() {
     width: 300,
     //useCORS: true,
     onrendered: function(canvas) {
-      var colorThief = new ColorThief();
-      var palette = JSON.stringify(colorThief.getPalette(canvas, 2));
-      cachePalette(palette);
-      self.port.emit("analysisFinished", palette);
+      try {
+        var colorThief = new ColorThief();
+        var palette = JSON.stringify(colorThief.getPalette(canvas, 2));
+        cachePalette(palette);
+        self.port.emit("analysisFinished", palette);
+      } catch(err) {
+          self.port.emit("error", err.message);
+      }
     }
   });
 }

@@ -1,44 +1,55 @@
-var nameElement = document.getElementById("name");
-var pictureElement = document.getElementById("picture");
-var loadingElement = document.getElementById("loading-message");
-var ingredientsElement = document.getElementById("ingredients");
+function barmanPanel(cocktail) {
+		this.currentCocktail = cocktail;
+		this.nameElement = document.getElementById("name");
+		this.pictureElement = document.getElementById("picture");
+		this.loadingElement = document.getElementById("loading-message");
+		this.ingredientsElement = document.getElementById("ingredients");
+		this.recipeLinkElement = document.getElementById("recipe-link");
 
-var hiddenElements = {}
+		this.hiddenElements = {}
 
-var revert = function () {
-	showElement(loadingElement);
+		this.renderCocktailInfo = function() {
+				this.nameElement.innerHTML = this.currentCocktail.title;
+				this.pictureElement.src = this.currentCocktail.picture;
+				this.setIngredientList(this.currentCocktail.ingredients);
+				this.recipeLinkElement.onclick = function () { redirectToRecipeSite(); };
+		}
+
+		this.hideElement = function(element) {
+			hiddenElements[element] = this.element.style;
+			element.style.visibility = "hidden";
+		}
+
+		this.showElement = function(element) {
+			element.style = this.hiddenElements[element];
+		}
+
+		this.setIngredientList = function(ingredients) {
+			while(this.ingredientsElement.firstChild) {
+				this.ingredientsElement.removeChild(this.ingredientsElement.firstChild);
+			}
+
+			for (var index in ingredients) {
+					var item = document.createElement("li");
+					item.innerHTML = ingredients[index];
+					this.ingredientsElement.appendChild(item);
+			}
+		}
 }
 
-var hideElement = function(element) {
-	hiddenElements[element] = element.style;
-	element.style.visibility = "hidden";
-}
+var currentPanel = null;
 
-var showElement = function(element) {
-	element.style = hiddenElements[element];
-}
-
-var setIngredientList = function(ingredients) {
-	while(ingredientsElement.firstChild) {
-		ingredientsElement.removeChild(ingredientsElement.firstChild);
-	}
-
-	for (var index in ingredients) {
-			var item = document.createElement("li");
-			item.innerHTML = ingredients[index];
-			ingredientsElement.appendChild(item);
-	}
+var redirectToRecipeSite = function() {
+	self.port.emit("redirectToRecipe", currentPanel.currentCocktail.url);
 }
 
 self.port.on("analysisFinished", function (cocktail) {
-	hideElement(loadingElement);
 	if (cocktail) {
-		nameElement.innerHTML = cocktail.title;
-		pictureElement.src = cocktail.picture;
-		setIngredientList(cocktail.ingredients);
+		currentPanel = new barmanPanel(cocktail);
+		currentPanel.renderCocktailInfo();
 	}
 });
 
+
 self.port.on("hide", function() {
-	revert();
 });

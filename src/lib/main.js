@@ -25,6 +25,10 @@ panel.port.on("hide-request", function() {
   panel.hide();
 });
 
+panel.port.on("redirectToRecipe", function(recipeSiteUrl) {
+  tabs.open(recipeSiteUrl);
+});
+
 var iconsDefault = {
   "16": "./icons/cocktail16.png",
   "32": "./icons/cocktail32.png",
