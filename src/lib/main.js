@@ -8,12 +8,13 @@ var dbapi = require('./db.js');
 const {Cu} = require("chrome");
 const {TextEncoder, TextDecoder, OS} = Cu.import("resource://gre/modules/osfile.jsm", {});
 
+var preloaded = false;
+
 var panel = require("sdk/panel").Panel({
-  width: 300,
-  height: 300,
+  width: 450,
+  height: 400,
   contentURL: data.url("panel/panel.html"),
   contentScriptFile: data.url("panel/panel.js"),
-  contentScriptStyle: data.url("panel/panel.css")
 });
 
 panel.on("hide", function() {
@@ -24,55 +25,60 @@ panel.port.on("hide-request", function() {
   panel.hide();
 });
 
+panel.port.on("redirectToRecipe", function(recipeSiteUrl) {
+  tabs.open(recipeSiteUrl);
+});
+
+var iconsDefault = {
+  "16": "./icons/cocktail16.png",
+  "32": "./icons/cocktail32.png",
+  "64": "./icons/cocktail64.png"
+};
+
 var button = buttons.ActionButton({
   id: "main-btn",
   label: "Barman",
-  icon: {
-    "16": "./icons/cocktail16.png",
-    "32": "./icons/cocktail32.png",
-    "64": "./icons/cocktail64.png"
-  },
-  onClick: preload
+  icon: iconsDefault,
+  onClick: startAnalysis
 });
 
 
 function preload(state) {
-  let decoder = new TextDecoder();        // This decoder can be reused for several reads
-  let promise = OS.File.read("/home/kafkaf/dev/cocktail_dumps/esquire/esquire_new.json"); // Read the complete file as an array
-  promise = promise.then(
-    function onSuccess(array) {
-      var str = decoder.decode(array);
-      var cocktails = JSON.parse(str);
-      for (var index in cocktails) {
-          var cocktail = cocktails[index];
-          dbapi.insert(cocktail);
-      }
-      console.log('Done inserting');
-      let encoder = new TextEncoder();                                   // This encoder can be reused for several writes
-      let array = encoder.encode(JSON.stringify(dbapi.cocktails));                   // Convert the text to an array
-      let promise2 = OS.File.writeAtomic("/home/kafkaf/dev/cocktail_dumps/esquire/esquire_new.json", array,               // Write the array atomically to "file.txt", using as temporary
-          {tmpPath: "file.txt.tmp"});
-      console.log('Done with IVector');
-
+    var str = data.load("cocktails.json");
+    var cocktails = JSON.parse(str);
+    for (var index in cocktails) {
+        var cocktail = cocktails[index];
+        dbapi.insert(cocktail);
     }
-  );
-
+    preloaded = true;
 }
+
 function startAnalysis(state) {
+    if (!preloaded) {
+      preload();
+    }
+
     var startSignal = "startAnalysis";
     var doneSignal = "analysisFinished";
+    var errorSignal = "error";
 
-  	var worker = tabs.activeTab.attach({
-		contentScriptWhen: "end",
-	  	contentScriptFile: [data.url("barman.js"), data.url("ext/html2canvas.js"), data.url("ext/color-thief.min.js")],
+    var worker = tabs.activeTab.attach({
+      contentScriptWhen: "end",
+    	contentScriptFile: [data.url("barman.js"), data.url("ext/html2canvas.js"), data.url("ext/color-thief.min.js")],
     });
 
     worker.port.on(doneSignal, function(palette) {
-      var p = new utils.Palette(palette.slice(1))
-      var chosenCocktail = engine.getCocktailByPalette(p);
-   		panel.port.emit(doneSignal, chosenCocktail)
- 	});
+      var sitePalette = new utils.Palette(JSON.parse(palette));
+      var chosenCocktail = engine.getCocktailByPalette(sitePalette, dbapi.cocktails);
+      panel.port.emit(doneSignal, chosenCocktail)
+      panel.show({
+         position: button
+       });
+    });
 
-    panel.show();
-	worker.port.emit(startSignal);
+    worker.port.on(errorSignal, function(message) {
+      console.log(message);
+    });
+
+    worker.port.emit(startSignal);
 }

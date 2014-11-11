@@ -29,16 +29,15 @@ function Palette(colors, IVector) {
 
     this.fit = function() {
       // Create a 3xn matrix where n = colors.length to represent the set of colors
-    var reds = [];
-    var greens = [];
-    var blues = [];
-    for(i = 0; i < this.colors.length; i++) {
-        reds.push(this.colors[i].r)
-        greens.push(this.colors[i].g)
-        blues.push(this.colors[i].b)
-    }
-
-    return emath.multipleRegression(reds, greens, blues);
+      var reds = [];
+      var greens = [];
+      var blues = [];
+      for(i = 0; i < this.colors.length; i++) {
+          reds.push(this.colors[i].r)
+          greens.push(this.colors[i].g)
+          blues.push(this.colors[i].b)
+      }
+      return emath.multipleRegression(reds, greens, blues);
   }
 
 

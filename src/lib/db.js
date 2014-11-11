@@ -12,4 +12,4 @@ exports.insert = function(cocktail) {
     } else {
       throw "Cocktail must have a palette"
     }
-  }
+}

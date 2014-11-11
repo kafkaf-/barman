@@ -1,22 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-<style type="text/css">
-  #loading-message
-  {
-    background-color: yellow;
-    min-width: 100%;
-    min-height: 100%;
-  }
-</style>
+	<link href="panel.css" rel="stylesheet" type="text/css">
 	<title></title>
 </head>
-<body>
-<div id="close">X</div>
-<div id="loading-message"> LOADING </div>
-<div id="content-container">
-	<div id="name"></div>
-	<img src="" id="picture">
-</div>
+<body class="body-noise">
+	<div id="content-container" class="noise">
+		<div id="name-container-div" class="name-container"><h1 id="name" class="name-text"></h1></div>
+		<br></br>
+		<br></br>
+		<div style="clear: both; "></div>
+		<div class="recipe-container">
+			<div class="cocktail-image-container ">
+				<img src="hplaceholder.png" id="picture"/>
+			</div>
+			<div id="recipe">
+				<ul id="ingredients" class="recipe-text recipe-list">
+				</ul>
+				<ul>
+					<a href="javascript:void(0);" id="recipe-link" class="recipe-link recipe-text" role="button">Open Recipe Page</a>
+				</ul>
+			</div>
+		</div>
+	</div>
 </body>
 </html>
